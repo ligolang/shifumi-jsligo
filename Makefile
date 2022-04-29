@@ -27,7 +27,7 @@ shifumi.json: contracts/main.jsligo
 
 clean:
 	@echo "Removing Michelson files"
-	@rm compiled/*.tz compiled/*.json
+	@rm -rf compiled/*.tz compiled/*.json
 
 test: test_ligo
 
