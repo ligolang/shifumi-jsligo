@@ -33,7 +33,7 @@ export type t = {
 
 export let new = ([total_rounds, players] : [nat, set<player>]): t => {
     return { 
-      asleep:Tezos.now + 600,
+      asleep:(Tezos.get_now ()) + 600,
       total_rounds:total_rounds,
       players:players,
       current_round:(1 as nat),
@@ -60,11 +60,11 @@ let get_decoded_round_actions = ([roundId, session] : [nat, t]) : decoded_player
 };
 
 export let update_rounds = ([session, rounds] : [t, map<round, player_actions>] ): t => {
-    return { ...session, asleep:Tezos.now + 600, rounds:rounds }    
+    return { ...session, asleep:(Tezos.get_now ()) + 600, rounds:rounds }    
 };
 
 export let update_decoded_rounds = ([session, decoded_rounds]: [t, map<round, decoded_player_actions>]): t => {
-    return { ...session, asleep:Tezos.now + 600, decoded_rounds:decoded_rounds };
+    return { ...session, asleep:(Tezos.get_now ()) + 600, decoded_rounds:decoded_rounds };
 };
 
 export let find_missing : <_a>((p: [list<an_action<_a>>, set<player>]) => set<player>) = ([pactions, all_players] : [list<an_action<_a>>, set<player>]) => {
