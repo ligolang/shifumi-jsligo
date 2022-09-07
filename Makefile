@@ -1,7 +1,7 @@
-ligo_compiler=docker run --rm -v "$$PWD":"$$PWD" -w "$$PWD" ligolang/ligo:0.41.0
-PROTOCOL_OPT=--protocol ithaca
+ligo_compiler=docker run --rm -v "$$PWD":"$$PWD" -w "$$PWD" ligolang/ligo:stable
+PROTOCOL_OPT=
 JSON_OPT=--michelson-format json
-
+tsc=npx tsc
 help:
 	@echo  'Usage:'
 	@echo  '  all             - Remove generated Michelson files, recompile smart contracts and lauch all tests'
@@ -46,7 +46,7 @@ deploy: node_modules deploy.js
 	@node deploy/deploy.js
 
 deploy.js: 
-	@cd deploy && tsc deploy.ts --resolveJsonModule -esModuleInterop
+	@cd deploy && $(tsc) deploy.ts --resolveJsonModule -esModuleInterop
 
 node_modules:
 	@echo "Install node modules"
