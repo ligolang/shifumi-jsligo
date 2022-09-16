@@ -1,7 +1,7 @@
 ligo_compiler=docker run --rm -v "$$PWD":"$$PWD" -w "$$PWD" ligolang/ligo:stable
-PROTOCOL_OPT=--protocol jakarta
+PROTOCOL_OPT=
 JSON_OPT=--michelson-format json
-
+tsc=npx tsc
 help:
 	@echo  'Usage:'
 	@echo  '  all             - Remove generated Michelson files, recompile smart contracts and lauch all tests'
@@ -51,7 +51,7 @@ metadata.json:
         deploy/metadata.json ; fi
 
 deploy.js:
-	@cd deploy && tsc deploy.ts --resolveJsonModule -esModuleInterop
+	@cd deploy && $(tsc) deploy.ts --resolveJsonModule -esModuleInterop
 
 node_modules:
 	@echo "Install node modules"

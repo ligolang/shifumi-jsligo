@@ -13,7 +13,6 @@ const Tezos = new TezosToolkit(rpc);
 const signer = new InMemorySigner(pk);
 Tezos.setProvider({ signer: signer })
 
-const admin = process.env.ADMIN_ADDRESS;
 let shifumi_address = process.env.SHIFUMI_CONTRACT_ADDRESS || undefined;
 
 async function orig() {
@@ -45,6 +44,7 @@ async function orig() {
 
     } catch (error: any) {
         console.log(error)
+        return process.exit(1)
     }
 }
 
