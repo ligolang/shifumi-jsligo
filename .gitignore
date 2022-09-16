@@ -5,3 +5,5 @@ _esy/
 /compiled
 **/compiled
 deploy/deploy.js
+deploy/metadata.json
+deploy/.env

@@ -41,11 +41,16 @@ test_ligo: test/test.mligo
 # 	@echo "Running integration tests (fail)"
 # 	@$(ligo_compiler) run test $^ $(PROTOCOL_OPT)
 
-deploy: node_modules deploy.js
+deploy: node_modules metadata.json deploy.js
 	@echo "Deploying contract"
 	@node deploy/deploy.js
 
-deploy.js: 
+metadata.json:
+	@echo "Generate metadata.json"
+	@if [ ! -f ./deploy/metadata.json ]; then cp deploy/metadata.json.dist \
+        deploy/metadata.json ; fi
+
+deploy.js:
 	@cd deploy && $(tsc) deploy.ts --resolveJsonModule -esModuleInterop
 
 node_modules:
