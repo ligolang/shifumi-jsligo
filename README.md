@@ -4,7 +4,7 @@ This contract implements a Shifumi game for 2 players. This smart contract imple
 
 Users can create a new session and specify players and the number of round.
 
-Players can choose an action (Stone, Paper, Cisor) secretly and commit their secret choice. 
+Players can choose an action (Stone, Paper, Cisor) secretly and commit their secret choice.
 Once all players have chosen their secret action, they can reveal it.
 
 Players can reveal their secret action and commit their secret choice.
@@ -16,26 +16,31 @@ The smart contract provides an on-chian view for retrieving the session informat
 
 In the case of a player refusing to play (and keep the session stuck), an entrypoint has been provided to claim victory for 10 minutes of inactivity.
 
-### Makefile usage 
+### Makefile usage
 
 The repository provides a Makefile for compiling/testing/deploying the smart contract Shifumi. All makefile targets are described with the `make` command.
 
-### Compile Shifumi contract 
+### Compile Shifumi contract
 
 The repository provides a Makefile for compiling the smart contract Shifumi.
 ```
 make compile
 ```
-It compiles the smart contract in TZ file and also in the JSON format 
+You can also override `make` parameters by running :
+```sh
+make compile ligo_compiler=<LIGO_EXECUTABLE> PROTOCOL_OPT="--protocol <PROTOCOL>"
+```
 
-### Test Shifumi contract 
+It compiles the smart contract in TZ file and also in the JSON format
+
+### Test Shifumi contract
 
 The repository provides a Makefile for testing the smart contract Shifumi.
 ```
 make test
 ```
 
-### Test Shifumi contract 
+### Test Shifumi contract
 
 The repository provides a deployment script for deploying the smart contract Shifumi.
 ```
@@ -46,5 +51,5 @@ It is based on a .env file that contains deployment information:
 ```
 ADMIN_PK - private key
 ADMIN_ADDRESS - public key
-RPC - URL of the RPC node that will process the transaction 
+RPC - URL of the RPC node that will process the transaction
 ```

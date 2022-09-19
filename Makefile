@@ -1,4 +1,6 @@
-ligo_compiler=docker run --rm -v "$$PWD":"$$PWD" -w "$$PWD" ligolang/ligo:stable
+ligo_compiler=docker run --rm -v "$(PWD)":"$(PWD)" -w "$(PWD)" ligolang/ligo:stable
+# ^ Override this variable when you run make command by make <COMMAND> ligo_compiler=<LIGO_EXECUTABLE>
+# ^ Otherwise use default one (you'll need docker)
 PROTOCOL_OPT=
 JSON_OPT=--michelson-format json
 tsc=npx tsc
@@ -33,11 +35,11 @@ clean:
 
 test: test_ligo
 
-test_ligo: test/test.mligo 
+test_ligo: test/test.mligo
 	@echo "Running integration tests"
 	@$(ligo_compiler) run test $^ $(PROTOCOL_OPT)
 
-# test_ligo_2: test/test2.mligo 
+# test_ligo_2: test/test2.mligo
 # 	@echo "Running integration tests (fail)"
 # 	@$(ligo_compiler) run test $^ $(PROTOCOL_OPT)
 
