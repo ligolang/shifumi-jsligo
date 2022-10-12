@@ -1,7 +1,7 @@
 ligo_compiler=docker run --rm -v "$(PWD)":"$(PWD)" -w "$(PWD)" ligolang/ligo:stable
 # ^ Override this variable when you run make command by make <COMMAND> ligo_compiler=<LIGO_EXECUTABLE>
 # ^ Otherwise use default one (you'll need docker)
-PROTOCOL_OPT=
+protocol_opt=
 JSON_OPT=--michelson-format json
 tsc=npx tsc
 help:
@@ -22,12 +22,12 @@ shifumi: shifumi.tz shifumi.json
 shifumi.tz: contracts/main.jsligo
 	@echo "Compiling smart contract to Michelson"
 	@mkdir -p compiled
-	@$(ligo_compiler) compile contract $^ -e main $(PROTOCOL_OPT) > compiled/$@
+	@$(ligo_compiler) compile contract $^ -e main $(protocol_opt) > compiled/$@
 
 shifumi.json: contracts/main.jsligo
 	@echo "Compiling smart contract to Michelson in JSON format"
 	@mkdir -p compiled
-	@$(ligo_compiler) compile contract $^ $(JSON_OPT) -e main $(PROTOCOL_OPT) > compiled/$@
+	@$(ligo_compiler) compile contract $^ $(JSON_OPT) -e main $(protocol_opt) > compiled/$@
 
 clean:
 	@echo "Removing Michelson files"
@@ -37,11 +37,11 @@ test: test_ligo
 
 test_ligo: test/test.mligo
 	@echo "Running integration tests"
-	@$(ligo_compiler) run test $^ $(PROTOCOL_OPT)
+	@$(ligo_compiler) run test $^ $(protocol_opt)
 
 # test_ligo_2: test/test2.mligo
 # 	@echo "Running integration tests (fail)"
-# 	@$(ligo_compiler) run test $^ $(PROTOCOL_OPT)
+# 	@$(ligo_compiler) run test $^ $(protocol_opt)
 
 deploy: node_modules metadata.json deploy.js
 	@echo "Deploying contract"
