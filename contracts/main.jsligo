@@ -59,8 +59,8 @@ const stopSession = ([param, store] : [Parameter.stopsession_param, Storage.t]) 
     }
 };
 
-// the player create a chest with the chosen action (Stone | Paper | Cisor) in backend
-// once the chest is created, the player send its chest to the smart contract
+// the player create a bytes with the chosen action (Stone | Paper | Cisor) in backend
+// once the bytes is created, the player send its bytes to the smart contract
 const play = ([param, store] : [Parameter.play_param, Storage.t]) : return_ => {
     let current_session : Session.t = Storage.getSession(param.sessionId, store);
     let _check_players : unit = Conditions.check_player_authorized((Tezos.get_sender ()), current_session.players, Errors.user_not_allowed_to_play_in_session);
@@ -73,9 +73,9 @@ const play = ([param, store] : [Parameter.play_param, Storage.t]) : return_ => {
     return [list([]) as list<operation>, new_storage];
 };
 
-// Once all players have committed their chest, they must reveal the content of their chest
+// Once all players have committed their bytes, they must reveal the content of their bytes
 const reveal = ([param, store] : [Parameter.reveal_param, Storage.t]) : return_ => {
-    // players can reveal only if all players have sent their chest
+    // players can reveal only if all players have sent their bytes
     let current_session : Session.t = Storage.getSession(param.sessionId, store);
     let _check_players : unit = Conditions.check_player_authorized((Tezos.get_sender ()), current_session.players, Errors.user_not_allowed_to_reveal_in_session);
     let _check_session_end : unit = Conditions.check_session_end(current_session.result, Inplay());
@@ -84,11 +84,11 @@ const reveal = ([param, store] : [Parameter.reveal_param, Storage.t]) : return_ 
     let numberOfPlayers : nat = Set.cardinal(current_session.players);
     let listsize = ([acc, _elt]: [nat, Session.player_action]) : nat => acc + (1 as nat);
     let numberOfActions : nat = List.fold(listsize, current_round_actions, (0 as nat));
-    let _check_all_players_have_played : unit = assert_with_error( (numberOfPlayers == numberOfActions), Errors.missing_player_chest);
-    // retrieve user chest (fails if not found)
-    let user_chest : chest = Session.get_chest_exn((Tezos.get_sender ()), (Some(current_round_actions)));
+    let _check_all_players_have_played : unit = assert_with_error( (numberOfPlayers == numberOfActions), Errors.missing_player_bytes);
+    // retrieve user bytes (fails if not found)
+    let user_bytes : bytes = Session.get_bytes_exn((Tezos.get_sender ()), (Some(current_round_actions)));
     // decode action
-    let decoded_action : Session.action = Session.decode_chest_exn(param.player_key, user_chest, param.player_secret);
+    let decoded_action : Session.action = Session.decode_bytes_exn(param.player_key, user_bytes, param.player_secret);
     let new_decoded_rounds = Session.add_in_decoded_rounds(current_session.current_round, current_session, (Tezos.get_sender ()), decoded_action);
     let new_current_session : Session.t = Session.update_decoded_rounds(current_session, new_decoded_rounds);
 

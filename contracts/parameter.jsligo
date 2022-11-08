@@ -10,13 +10,13 @@ export type stopsession_param = {
 export type play_param = {
     sessionId : nat,
     roundId : nat,
-    action : chest
+    action : bytes
 };
 
 export type reveal_param = {
     sessionId : nat,
     roundId : nat,
-    player_key : chest_key,
+    player_key : bytes,
     player_secret : nat
 };
 
