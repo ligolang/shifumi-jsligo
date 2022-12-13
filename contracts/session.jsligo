@@ -10,7 +10,7 @@ type an_action<a> = {
     action : a 
 };
 
-export type player_action = an_action<chest>;
+export type player_action = an_action<bytes>;
 export type decoded_player_action = an_action<action>;
 
 export type player_actions = list<player_action>;
@@ -24,7 +24,7 @@ export type t = {
     total_rounds : nat,
     players : set<player>,
     current_round : nat,
-    rounds : rounds<chest>,
+    rounds : rounds<bytes>,
     decoded_rounds : rounds<action>,
     board : board,
     result : result,
@@ -37,7 +37,7 @@ export const new = ([total_rounds, players] : [nat, set<player>]): t => {
       total_rounds:total_rounds,
       players:players,
       current_round:(1 as nat),
-      rounds:(Map.empty as rounds<chest>),
+      rounds:(Map.empty as rounds<bytes>),
       decoded_rounds:(Map.empty as rounds<action>),
       board:(Map.empty as board),
       result: Inplay()
@@ -46,7 +46,7 @@ export const new = ([total_rounds, players] : [nat, set<player>]): t => {
 
 export const get_round_actions = ([roundId, session] : [nat, t]) : player_actions => {
     return match (Map.find_opt(roundId, session.rounds), { 
-        None: () => failwith(Errors.missing_all_chests),
+        None: () => failwith(Errors.missing_all_bytes),
         Some: (round_actions: player_actions) => round_actions 
     });
 };
@@ -54,7 +54,7 @@ export const get_round_actions = ([roundId, session] : [nat, t]) : player_action
 // @inline
 const get_decoded_round_actions = ([roundId, session] : [nat, t]) : decoded_player_actions => {
     match (Map.find_opt(roundId, session.decoded_rounds), { 
-        None: () => failwith(Errors.missing_all_decoded_chests),
+        None: () => failwith(Errors.missing_all_decoded_bytes),
         Some: (decoded_round_actions: decoded_player_actions) => decoded_round_actions 
     });
 };
@@ -96,49 +96,48 @@ export const add_in_decoded_rounds = ([roundId, session, user, decoded_action]: 
     });
 };
 
-export const add_in_rounds = ([roundId, session, user, action] : [nat, t, address, chest]) : rounds<chest> => {
+export const add_in_rounds = ([roundId, session, user, action] : [nat, t, address, bytes]) : rounds<bytes> => {
     return match (Map.find_opt(roundId, session.rounds), { 
         None: () => Map.add(roundId, list([{player:user, action:action}]), session.rounds),
-        Some: (playerActions: list<an_action<chest>>) => {
+        Some: (playerActions: list<an_action<bytes>>) => {
             let _check_player_has_played_this_round = assert_with_error( (has_played_round(session.rounds, roundId, user) == false), Errors.user_already_played);
             Map.update(roundId, (Some( list([ {player:user, action:action},  ...playerActions]))), session.rounds);
         }
     });
 };
 
-export const get_chest_exn = ([user, actions_opt] : [address, option<player_actions>]) : chest => {
-    let find_chest = ([addr, lst_opt] : [address, option<player_actions>]) : option<chest> => {
+export const get_bytes_exn = ([user, actions_opt] : [address, option<player_actions>]) : bytes => {
+    let find_bytes = ([addr, lst_opt] : [address, option<player_actions>]) : option<bytes> => {
         return match (lst_opt, {
-            None: () => (None() as option<chest>),
+            None: () => (None() as option<bytes>),
             Some: (lst: player_actions) => (match (List.head_opt(lst), {
-                None: () => (None() as option<chest>),
+                None: () => (None() as option<bytes>),
                 Some: (elt: player_action) => { 
                         if (elt.player == addr) {
-                            return (Some(elt.action) as option<chest>)
+                            return (Some(elt.action) as option<bytes>)
                         } else {
-                            return find_chest(addr, List.tail_opt(lst));
+                            return find_bytes(addr, List.tail_opt(lst));
                         }
                     }
                 }))
         });
     };
-    return match (find_chest(user, actions_opt), {
-        None: () => (failwith(Errors.missing_sender_chest) as chest),
-        Some: (ch: chest) => ch
+    return match (find_bytes(user, actions_opt), {
+        None: () => (failwith(Errors.missing_sender_bytes) as bytes),
+        Some: (ch: bytes) => ch
     });
 };
 
-export const decode_chest_exn = ([player_key, user_chest, player_secret]: [chest_key, chest, nat]): action => { 
-    let decoded_payload =
-        match (Tezos.open_chest(player_key, user_chest, player_secret), {
-            Ok_opening: (b: bytes) => b,
-            Fail_timelock: () => (failwith(Errors.failed_to_open_chest) as bytes),
-            Fail_decrypt: () => (failwith(Errors.failed_to_open_chest) as bytes)
+export const decode_bytes_exn = ([player_bytes, user_bytes, player_secret]: [bytes, bytes, nat]): action => { 
+    let hashed = Crypto.sha512(Bytes.pack(player_bytes, player_secret));
+    if (hashed == user_bytes) {
+        return match ((Bytes.unpack(player_bytes) as option<action>), {
+            None: () => failwith(Errors.failed_to_unpack_payload),
+            Some: (x: action) => x
         });
-    return match ((Bytes.unpack(decoded_payload) as option<action>), {
-        None: () => failwith(Errors.failed_to_unpack_payload),
-        Some: (x: action) => x
-    });
+    } else {
+        return failwith(Errors.failed_to_open_bytes);
+    }
 };
 
 // @inline
