@@ -11,6 +11,7 @@ Players can reveal their secret action and commit their secret choice.
 Once all players have revealed their secret action (for the current round), the result for this round is computed and the session goes to the next round. The result of the session is automatically computed once all rounds have been played.
 
 The smart contract provides an on-chian view for retrieving the session information:
+
 - the status of a session (Inplay, Winner, Draw)
 - winners for each round
 
@@ -23,10 +24,13 @@ The repository provides a Makefile for compiling/testing/deploying the smart con
 ### Compile Shifumi contract
 
 The repository provides a Makefile for compiling the smart contract Shifumi.
+
 ```
 make compile
 ```
+
 You can also override `make` parameters by running :
+
 ```sh
 make compile ligo_compiler=<LIGO_EXECUTABLE> protocol_opt="--protocol <PROTOCOL>"
 ```
@@ -36,6 +40,7 @@ It compiles the smart contract in TZ file and also in the JSON format
 ### Test Shifumi contract
 
 The repository provides a Makefile for testing the smart contract Shifumi.
+
 ```
 make test
 ```
@@ -43,13 +48,9 @@ make test
 ### Test Shifumi contract
 
 The repository provides a deployment script for deploying the smart contract Shifumi.
+
 ```
 make deploy
 ```
 
-It is based on a .env file that contains deployment information:
-```
-ADMIN_PK - private key
-ADMIN_ADDRESS - public key
-RPC - URL of the RPC node that will process the transaction
-```
+You have to rename `deploy/.env.dist` to `deploy/.env` and **fill the required variables** to be able to deploy.
