@@ -19,12 +19,12 @@ compile: shifumi
 
 shifumi: shifumi.tz shifumi.json
 
-shifumi.tz: contracts/main.jsligo
+shifumi.tz: src/main.jsligo
 	@echo "Compiling smart contract to Michelson"
 	@mkdir -p compiled
 	@$(ligo_compiler) compile contract $^ -e main $(protocol_opt) > compiled/$@
 
-shifumi.json: contracts/main.jsligo
+shifumi.json: src/main.jsligo
 	@echo "Compiling smart contract to Michelson in JSON format"
 	@mkdir -p compiled
 	@$(ligo_compiler) compile contract $^ $(JSON_OPT) -e main $(protocol_opt) > compiled/$@
@@ -39,22 +39,20 @@ test_ligo: test/test.mligo
 	@echo "Running integration tests"
 	@$(ligo_compiler) run test $^ $(protocol_opt)
 
-# test_ligo_2: test/test2.mligo
-# 	@echo "Running integration tests (fail)"
-# 	@$(ligo_compiler) run test $^ $(protocol_opt)
+deploy: node_modules deploy.js
 
-deploy: node_modules metadata.json deploy.js
-	@echo "Deploying contract"
-	@node deploy/deploy.js
+deploy.js:
+	@if [ ! -f ./deploy/metadata.json ]; then cp deploy/metadata.json.dist deploy/metadata.json ; fi
+	@echo "Running deploy script\n"
+	@cd deploy && npm start
+
+node_modules:
+	@echo "Installing deploy script dependencies"
+	@cd deploy && npm install
+	@echo ""
+
 
 metadata.json:
 	@echo "Generate metadata.json"
 	@if [ ! -f ./deploy/metadata.json ]; then cp deploy/metadata.json.dist \
         deploy/metadata.json ; fi
-
-deploy.js:
-	@cd deploy && $(tsc) deploy.ts --resolveJsonModule -esModuleInterop
-
-node_modules:
-	@echo "Install node modules"
-	@cd deploy && npm install
