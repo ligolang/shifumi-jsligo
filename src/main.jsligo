@@ -101,7 +101,7 @@ const play = (param : Parameter.play_param, store : Storage.t) : return_ => {
     
     return match (Map.find_opt(new_session.current_round,new_session.rounds), {
         None : () => [list([]) as list<operation>, new_storage],
-        Some : (current_round : Session.rounds) => {
+        Some : (current_round : Session.player_actions) => {
             if( List.size( current_round  ) != (2 as nat) ){ return [list([]) as list<operation>, new_storage]}
             else { return  [list([ Tezos.emit("%reveal","")  ]) as list<operation>, new_storage]}
         }

@@ -224,7 +224,7 @@ const compute_result = (sess: t) : result => {
             None: () => acc,
             Some: (winner_round: player) => match (Map.find_opt(winner_round, acc), {
                 None: () => Map.add(winner_round, (1 as nat), acc),
-                Some: (old_value: map<address, nat>) => Map.update(winner_round, (Some(old_value + (1 as nat))), acc)
+                Some: (old_value) => Map.update(winner_round, (Some(old_value + (1 as nat))), acc)
             })
         });
     };
