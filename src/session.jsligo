@@ -38,7 +38,7 @@ export const new = (total_rounds : nat, players : list<player>): t => {
       asleep:(Tezos.get_now ()) + 600,
       total_rounds:total_rounds,
       players:players,
-      current_round:(1 as nat),
+      current_round:1n,
       rounds:(Map.empty as rounds<bytes>),
       decoded_rounds:(Map.empty as rounds<action>),
       board:(Map.empty as board),
@@ -211,7 +211,7 @@ export const finalize_current_round = (session: t) : t => {
     let [check_all_players_have_revealed, _all_decoded_actions] : [bool, decoded_player_actions] = List.fold(all_player_have_revealed, session.players, [true, performed_actions]);
     // all players have given their actions, now the board can be updated and session goes to next round
     if (check_all_players_have_revealed == true) {
-        return { ...session, current_round:session.current_round+(1 as nat), board:update_board(session, session.current_round) };
+        return { ...session, current_round:session.current_round+1n, board:update_board(session, session.current_round) };
     } else {
         return session;
     }
@@ -223,13 +223,13 @@ const compute_result = (sess: t) : result => {
         return match (elt[1]) {
             when(None()): acc;
             when(Some(winner_round)): match (Map.find_opt(winner_round, acc)) {
-                when(None()): Map.add(winner_round, (1 as nat), acc);
-                when(Some(old_value)): Map.update(winner_round, (Some(old_value + (1 as nat))), acc);
+                when(None()): Map.add(winner_round, 1n, acc);
+                when(Some(old_value)): Map.update(winner_round, (Some(old_value + 1n)), acc);
             };
         };
     };
     let final_scores = Map.fold(compute_points, sess.board, (Map.empty as map<address, nat>));
-    let [winner_addr, winner_points, multiple_winners] : [option<address>, nat, bool] = [(None() as option<address>), (0 as nat), false];
+    let [winner_addr, winner_points, multiple_winners] : [option<address>, nat, bool] = [(None() as option<address>), 0n, false];
     let leader_score = ([acc, elt] : [[option<address>, nat, bool], [address, nat]]) : [option<address>, nat, bool] => {
         let [win_addr, win_points, multiple] = acc;
         return match (win_addr) {

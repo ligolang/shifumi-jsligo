@@ -11,8 +11,8 @@ export const retrieve_board = (sess : Session.t) : sessionBoard => {
         match (elt[1]) {
             when(None()): acc;
             when(Some(winner_round)): match (Map.find_opt(winner_round, acc)) {
-                when(None()): Map.add(winner_round, (1 as nat), acc);
-                when(Some(old_value)): Map.update(winner_round, (Some(old_value + (1 as nat))), acc)
+                when(None()): Map.add(winner_round, 1n, acc);
+                when(Some(old_value)): Map.update(winner_round, (Some(old_value + 1n)), acc)
             };
         };
     let final_scores = Map.fold(myfunc, sess.board, scores);

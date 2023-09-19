@@ -15,7 +15,7 @@ export type return_ = [list<operation>, storage];
 const createSession = (param : Parameter.createsession_param, store : Storage.t) : return_ => {
     let new_session : Session.t = Session.new(param.total_rounds, param.players);
     let new_storage : Storage.t = { ...store,
-        next_session: store.next_session + (1 as nat),
+        next_session: store.next_session + 1n,
         sessions: Map.add(store.next_session, new_session, store.sessions)
     };
     return [list([]) as list<operation>, new_storage];
@@ -25,7 +25,7 @@ const createSession = (param : Parameter.createsession_param, store : Storage.t)
 // search for a non troller in the session
 const find_me_a_name = (sessionId : nat, missing_players : list<Session.player>, current_session : Session.t, store : Storage.t) : return_ => {
 
-    assert_with_error( List.size(missing_players) == (1 as nat), Errors.no_winner);
+    assert_with_error( List.size(missing_players) == 1n, Errors.no_winner);
 
     const loser = Option.unopt(List.head_opt(missing_players));
     let winners_list : list<address> = ListUtils.remove(( (a : address) => a == loser), current_session.players, (list([]) as list<address>));
@@ -40,8 +40,8 @@ const find_me_a_name = (sessionId : nat, missing_players : list<Session.player>,
 const declare_a_draw = (sessionId : nat, current_session : Session.t, store: Storage.t) : return_ => {
     let new_current_session : Session.t = {...current_session, result:Draw() };
     let new_storage : Storage.t = Storage.update_sessions(store, sessionId, new_current_session);
-    let player1ToRedeemOp : operation = Tezos.transaction(unit,(new_current_session.pool / (2 as tez)) * (1 as tez) ,Tezos.get_contract_with_error(Option.unopt(List.head_opt(new_current_session.players)),Errors.player_contract_address_not_found));
-    let player2ToRedeemOp : operation = Tezos.transaction(unit,(new_current_session.pool / (2 as tez)) * (1 as tez),Tezos.get_contract_with_error(Option.unopt(List.head_opt(Option.unopt(List.tail_opt(new_current_session.players)))),Errors.player_contract_address_not_found));
+    let player1ToRedeemOp : operation = Tezos.transaction(unit,(new_current_session.pool / 2tez) * 1tez ,Tezos.get_contract_with_error(Option.unopt(List.head_opt(new_current_session.players)),Errors.player_contract_address_not_found));
+    let player2ToRedeemOp : operation = Tezos.transaction(unit,(new_current_session.pool / 2tez) * 1tez,Tezos.get_contract_with_error(Option.unopt(List.head_opt(Option.unopt(List.tail_opt(new_current_session.players)))),Errors.player_contract_address_not_found));
     return [list([player1ToRedeemOp,player2ToRedeemOp,Tezos.emit("%gameStatus",sessionId)]) as list<operation>, new_storage];
 };
 
@@ -63,7 +63,7 @@ const stopSession = (param : Parameter.stopsession_param, store : Storage.t) : r
         when(Some(rnd)): rnd;
     };
     let missing_players = Session.find_missing(current_round, current_session.players);
-    if (List.size(missing_players) > (0 as nat)) {
+    if (List.size(missing_players) > 0n) {
         return find_me_a_name (param.sessionId, missing_players, current_session, store);
     } else {
 
@@ -75,7 +75,7 @@ const stopSession = (param : Parameter.stopsession_param, store : Storage.t) : r
         else {
             let current_decoded_round = Option.unopt(current_decoded_round_opt);
             let missing_players_for_reveal = Session.find_missing(current_decoded_round, current_session.players);
-            if (List.size(missing_players_for_reveal) > (0 as nat)) {
+            if (List.size(missing_players_for_reveal) > 0n) {
                 return find_me_a_name (param.sessionId, missing_players_for_reveal, current_session, store);
             } else {
                 return [list([]) as list<operation>, store]
@@ -95,17 +95,17 @@ const play = (param : Parameter.play_param, store : Storage.t) : return_ => {
 
 
     // you can play only once per round, so we take money for every round
-    if(Tezos.get_amount() < (1 as tez)) return failwith(Errors.player_needs_to_pay_to_play);
+    if(Tezos.get_amount() < 1tez) return failwith(Errors.player_needs_to_pay_to_play);
 
     // register action
     let new_rounds = Session.add_in_rounds(current_session.current_round, current_session, (Tezos.get_sender ()), param.action);
-    let new_session : Session.t = Session.update_rounds({...current_session,pool:(current_session.pool + (1 as tez))}, new_rounds);
+    let new_session : Session.t = Session.update_rounds({...current_session,pool:(current_session.pool + 1tez)}, new_rounds);
     let new_storage : Storage.t = Storage.update_sessions(store, param.sessionId, new_session);
 
     return match (Map.find_opt(new_session.current_round,new_session.rounds)) {
         when(None()): [list([]) as list<operation>, new_storage];
         when(Some(current_round)): do {
-            if( List.size( current_round  ) != (2 as nat) ){ return [list([]) as list<operation>, new_storage]}
+            if( List.size( current_round  ) != 2n ){ return [list([]) as list<operation>, new_storage]}
             else { return  [list([ Tezos.emit("%reveal",param.sessionId)  ]) as list<operation>, new_storage]}
         };
     };
@@ -121,8 +121,8 @@ const revealPlay = (param : Parameter.reveal_param, store : Storage.t) : return_
     let _check_round : unit = assert_with_error( (current_session.current_round == param.roundId), Errors.wrong_current_round);
     let current_round_actions : Session.player_actions = Session.get_round_actions(current_session.current_round, current_session);
     let numberOfPlayers : nat = List.size(current_session.players);
-    let listsize = ([acc, _elt]: [nat, Session.player_action]) : nat => acc + (1 as nat);
-    let numberOfActions : nat = List.fold(listsize, current_round_actions, (0 as nat));
+    let listsize = ([acc, _elt]: [nat, Session.player_action]) : nat => acc + 1n;
+    let numberOfActions : nat = List.fold(listsize, current_round_actions, 0n);
     let _check_all_players_have_played : unit = assert_with_error( (numberOfPlayers == numberOfActions), Errors.missing_player_bytes);
     // retrieve user bytes (fails if not found)
     let user_bytes : bytes = Session.get_bytes_exn((Tezos.get_sender ()), (Some(current_round_actions)));
@@ -142,8 +142,8 @@ const revealPlay = (param : Parameter.reveal_param, store : Storage.t) : return_
         when(Inplay()): do { if(final_current_session.current_round == current_session.current_round) {return [list([]) as list<operation>, new_storage]}
                          else {return [list([Tezos.emit("%newRound",param.sessionId)]) as list<operation>, new_storage]}};
         when(Draw()): do {
-            let player1ToRedeemOp : operation = Tezos.transaction(unit,(new_current_session.pool / (2 as tez)) * (1 as tez) ,Tezos.get_contract_with_error(Option.unopt(List.head_opt(new_current_session.players)),Errors.player_contract_address_not_found));
-            let player2ToRedeemOp : operation = Tezos.transaction(unit,(new_current_session.pool / (2 as tez)) * (1 as tez),Tezos.get_contract_with_error(Option.unopt(List.head_opt(Option.unopt(List.tail_opt(new_current_session.players)))),Errors.player_contract_address_not_found));
+            let player1ToRedeemOp : operation = Tezos.transaction(unit,(new_current_session.pool / 2tez) * 1tez ,Tezos.get_contract_with_error(Option.unopt(List.head_opt(new_current_session.players)),Errors.player_contract_address_not_found));
+            let player2ToRedeemOp : operation = Tezos.transaction(unit,(new_current_session.pool / 2tez) * 1tez,Tezos.get_contract_with_error(Option.unopt(List.head_opt(Option.unopt(List.tail_opt(new_current_session.players)))),Errors.player_contract_address_not_found));
             return [list([player1ToRedeemOp, player2ToRedeemOp, Tezos.emit("%gameStatus",param.sessionId)  ]) as list<operation>, new_storage]};
         when(Winner(winner)): do {
             let opToRedeem : operation = Tezos.transaction(unit,(new_current_session.pool as tez),Tezos.get_contract_with_error(winner,Errors.player_contract_address_not_found));
