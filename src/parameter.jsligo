@@ -19,5 +19,3 @@ export type reveal_param = {
     player_key : bytes,
     player_secret : nat
 };
-
-export type t = ["CreateSession", createsession_param] | ["Play", play_param] | ["RevealPlay", reveal_param] | ["StopSession", stopsession_param];
