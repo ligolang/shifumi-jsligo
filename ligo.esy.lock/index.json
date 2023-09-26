@@ -1,0 +1,15 @@
+{
+  "checksum": "0cc961f41dbf4ff5ab5654751a4ba36e",
+  "root": "@ligo/shifumi-jsligo@link-dev:./ligo.json",
+  "node": {
+    "@ligo/shifumi-jsligo@link-dev:./ligo.json": {
+      "id": "@ligo/shifumi-jsligo@link-dev:./ligo.json",
+      "name": "@ligo/shifumi-jsligo",
+      "version": "link-dev:./ligo.json",
+      "source": { "type": "link-dev", "path": ".", "manifest": "ligo.json" },
+      "overrides": [],
+      "dependencies": [],
+      "devDependencies": []
+    }
+  }
+}
