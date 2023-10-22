@@ -7,7 +7,6 @@
 #import "listUtils.jsligo" "ListUtils"
 
 export type storage = Storage.t;
-export type parameter = Parameter.t;
 export type return_ = [list<operation>, storage];
 
 // Anyone can create a session (must specify players and number of rounds)
